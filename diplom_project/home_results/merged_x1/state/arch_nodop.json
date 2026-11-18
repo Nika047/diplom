@@ -1,0 +1,136 @@
+{
+ "best": {
+  "params": {
+   "n_blocks": 2,
+   "block_0": "GRU",
+   "block_1": "Attention",
+   "hidden": 128,
+   "dropout": 0.1556371865230098,
+   "batch": 1024,
+   "lr": 0.0007509758811233661,
+   "weight_decay": 5.6930747676446135e-06,
+   "use_0": true,
+   "use_1": true,
+   "use_2": true,
+   "use_3": true,
+   "use_4": false,
+   "use_5": false,
+   "use_6": true
+  },
+  "ade_val": 42.96821212768555,
+  "ms": 0.36480004200711846
+ },
+ "fast": {
+  "params": {
+   "n_blocks": 1,
+   "block_0": "GRU",
+   "hidden": 64,
+   "dropout": 0.1556371865230098,
+   "batch": 1024,
+   "lr": 0.002751493870442226,
+   "weight_decay": 0.00036226665947286665,
+   "use_0": true,
+   "use_1": true,
+   "use_2": true,
+   "use_3": false,
+   "use_4": false,
+   "use_5": false,
+   "use_6": false
+  },
+  "ade_val": 44.24750518798828,
+  "ms": 0.16460003098472953
+ },
+ "default": {
+  "params": {
+   "n_blocks": 2,
+   "block_0": "GRU",
+   "block_1": "GRU",
+   "hidden": 64,
+   "dropout": 0.1,
+   "batch": 512,
+   "lr": 0.001,
+   "weight_decay": 0.0001,
+   "use_0": true,
+   "use_1": true,
+   "use_2": true,
+   "use_3": true,
+   "use_4": true,
+   "use_5": true,
+   "use_6": true
+  },
+  "ade_val": 43.3090705871582,
+  "ms": 0.26920001255348325
+ },
+ "importance": {
+  "groups": [
+   {
+    "group": "отметка",
+    "ade_with": 44.00969856262207,
+    "ade_without": 45.00306561787923,
+    "share_in_top": 0.875
+   },
+   {
+    "group": "оценка IMM",
+    "ade_with": 44.14666407658503,
+    "ade_without": 45.402915445963544,
+    "share_in_top": 0.8125
+   },
+   {
+    "group": "скорость IMM",
+    "ade_with": 43.93367862701416,
+    "ade_without": 45.055010080337524,
+    "share_in_top": 0.8125
+   },
+   {
+    "group": "невязка",
+    "ade_with": 44.00804843324603,
+    "ade_without": 44.64492124192258,
+    "share_in_top": 0.625
+   },
+   {
+    "group": "вероятности моделей",
+    "ade_with": 44.53173949870657,
+    "ade_without": 44.169246673583984,
+    "share_in_top": 0.5
+   },
+   {
+    "group": "NIS моделей",
+    "ade_with": 44.36251954774599,
+    "ade_without": 44.399155195369275,
+    "share_in_top": 0.5
+   },
+   {
+    "group": "дальность",
+    "ade_with": 44.174232165018715,
+    "ade_without": 44.5523758801547,
+    "share_in_top": 0.5
+   }
+  ],
+  "blocks": [
+   {
+    "block": "GRU",
+    "ade_with": 44.50043907944037,
+    "ade_without": 44.19533489596459,
+    "share_in_top_blocks": 0.3125
+   },
+   {
+    "block": "LSTM",
+    "ade_with": 44.0257214864095,
+    "ade_without": 44.596105041503904,
+    "share_in_top_blocks": 0.28125
+   },
+   {
+    "block": "Mamba",
+    "ade_with": 43.9640775680542,
+    "ade_without": 44.52158908843994,
+    "share_in_top_blocks": 0.21875
+   },
+   {
+    "block": "Attention",
+    "ade_with": 44.257236882259974,
+    "ade_without": 44.42113763777936,
+    "share_in_top_blocks": 0.1875
+   }
+  ]
+ }
+}

@@ -1,0 +1,210 @@
+"""
+Обучение корректора: AdamW, MSE по нормированной поправке, ранняя остановка по val.
+
+Лучшие веса (минимум val loss) возвращаются вместе с историей по эпохам. Оценка на
+val - без teacher forcing (у корректора его и нет: прогноз за один проход).
+
+Проверяется на этапе 2: overfit one batch, падение loss при обучении.
+"""
+
+import time
+from pathlib import Path
+
+import numpy as np
+import torch
+from torch import nn
+
+import config
+from common.logging_setup import get_logger
+
+
+def pick_device() -> torch.device:
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def _batches(n: int, batch: int, rng: np.random.Generator = None):
+    order = rng.permutation(n) if rng is not None else np.arange(n)
+    for i in range(0, n, batch):
+        yield order[i:i + batch]
+
+
+def _preload(arr: np.ndarray, device: torch.device):
+    """Массив целиком на видеокарту (если она есть и массив не больше GPU_PRELOAD_MAX_GB), иначе он сам."""
+    if device.type != "cuda" or not isinstance(arr, np.ndarray) or arr.nbytes > config.GPU_PRELOAD_MAX_GB * 2 ** 30:
+        return arr
+    return torch.from_numpy(np.ascontiguousarray(arr)).to(device)
+
+
+def _rows(arr, idx: np.ndarray, device: torch.device) -> torch.Tensor:
+    """Строки idx на device: из тензора на видеокарте - без копирования с процессора, из numpy - с копированием."""
+    if isinstance(arr, torch.Tensor):
+        return arr[torch.from_numpy(idx).to(arr.device)]
+    return torch.from_numpy(arr[idx]).to(device, non_blocking=True)
+
+
+@torch.no_grad()
+def predict(model: nn.Module, x: np.ndarray, device: torch.device, batch: int = 4096) -> np.ndarray:
+    # Модель переносится сюда же: необученная модель ещё на процессоре, а входы - на device
+    # (на рабочем ПК без GPU смоук этого не ловит, дома дважды падали этапы 5 и 6г)
+    model.to(device).eval()
+    out = []
+    for idx in _batches(len(x), batch):
+        out.append(model(torch.from_numpy(x[idx]).to(device)).cpu().numpy())
+    return np.concatenate(out) if out else np.zeros((0,) + tuple(model.head.bias.shape))
+
+
+def _mse_loss(pred: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    return ((pred - y) ** 2).mean()
+
+
+def weighted_mse(pred: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    """MSE с весом примера (этап 13): y (N, H*2 + 1) - цель и вес в последнем столбце; среднее с весами."""
+    w = y[:, -1]
+    err = ((pred.reshape(len(y), -1) - y[:, :-1]) ** 2).mean(dim=1)
+    return (w * err).sum() / w.sum()
+
+
+@torch.no_grad()
+def mse(model: nn.Module, x: np.ndarray, y: np.ndarray, device: torch.device, batch: int = 4096,
+        loss_fn=None) -> float:
+    """Средний loss на наборе. loss_fn(pred, y) - своя функция потерь (этап 5), по умолчанию MSE."""
+    model.eval()
+    total, n = 0.0, 0
+    for idx in _batches(len(x), batch):
+        pred = model(_rows(x, idx, device))
+        yb = _rows(y, idx, device)
+        if loss_fn is None:
+            total += float(((pred - yb) ** 2).sum())
+            n += pred.numel()
+        else:
+            total += float(loss_fn(pred, yb)) * len(idx)
+            n += len(idx)
+    return total / max(n, 1)
+
+
+def overfit_one_batch(model: nn.Module, x: np.ndarray, y: np.ndarray, steps: int, lr: float,
+                      device: torch.device, loss_fn=None, clip: float = None) -> tuple:
+    """Обучение на одном батче. Возвращает (loss в начале, loss в конце).
+
+    Dropout на время проверки отключается: это регуляризация, она мешает запомнить
+    батч, и при dropout 0,3 маленькая сеть не доходит до порога (этап 4б).
+    clip - ограничение нормы градиента, как в train. Нужно сетям внутри фильтра
+    (этап 6в): градиент через все шаги фильтра доходит до 1e5, и без ограничения loss
+    на одном батче не сходится.
+    """
+    model.to(device).train()
+    saved = []
+    for mod in model.modules():
+        if isinstance(mod, (nn.Dropout, nn.RNNBase, nn.MultiheadAttention)):
+            attr = "p" if isinstance(mod, nn.Dropout) else "dropout"
+            saved.append((mod, attr, getattr(mod, attr)))
+            setattr(mod, attr, 0.0)
+    xb, yb = torch.from_numpy(x).to(device), torch.from_numpy(y).to(device)
+    opt = torch.optim.Adam(model.parameters(), lr=lr)
+    loss_fn = loss_fn or _mse_loss
+    first = last = None
+    for _ in range(steps):
+        opt.zero_grad()
+        loss = loss_fn(model(xb), yb)
+        loss.backward()
+        if clip is not None:
+            nn.utils.clip_grad_norm_(model.parameters(), clip)
+        opt.step()
+        first = float(loss.detach()) if first is None else first
+        last = float(loss.detach())
+    for mod, attr, value in saved:
+        setattr(mod, attr, value)
+    return first, last
+
+
+def _save_checkpoint(path: Path, model, opt, history, val0, best_val, best_state, bad, rng, finished: bool) -> None:
+    tmp = path.with_suffix(".tmp")
+    torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "history": history, "val0": val0,
+                "best_val": best_val, "best_state": best_state, "bad": bad, "rng": rng.bit_generator.state,
+                "torch_rng": torch.get_rng_state(), "finished": finished}, tmp)
+    tmp.replace(path)   # запись целиком: прерывание посреди записи не портит прежний файл
+
+
+def train(model: nn.Module, x_tr, y_tr, x_val, y_val, params: dict, device: torch.device,
+          rng: np.random.Generator, quiet: bool = False, loss_fn=None, ckpt_path: Path = None) -> tuple:
+    """
+    Возвращает (история по эпохам, лучшие веса). quiet - без строки на каждую эпоху
+    (подбор). loss_fn(pred, y) - своя функция потерь, по умолчанию MSE.
+    params["warmup_steps"] - первые шаги lr растёт линейно от нуля (широкие Transformer этапа 3);
+    по умолчанию 0 - без разгона.
+    params["skip_nonfinite"] - пропускать шаг, если loss или градиент не конечны (сети внутри
+    фильтра, этап 6в: один батч с расходящимся фильтром давал nan во всех весах до конца
+    обучения). По умолчанию выключено: остальные этапы считаются без пропуска шагов.
+    ckpt_path - файл контрольной точки (остановка и продолжение): после каждой эпохи
+    пишутся веса, оптимизатор, история и состояние генераторов; если файл есть, обучение
+    продолжается с последней сохранённой эпохи. Без него (по умолчанию) контрольных точек нет.
+    Продолжение не совпадает с непрерывным обучением до бита: состояние генераторов CUDA не хранится.
+    На видеокарте окна train и val загружаются в её память один раз (_preload): батчи те же, но без
+    копирования с процессора на каждом шаге; loss эпохи копится там же, без ожидания видеокарты на каждом батче.
+    """
+    log = get_logger()
+    log_epoch = log.debug if quiet else log.info
+    model.to(device)
+    opt = torch.optim.AdamW(model.parameters(), lr=params["lr"], weight_decay=params.get("weight_decay", 1e-4))
+    history = []
+    best_val, best_state, bad = float("inf"), None, 0
+    skip_nonfinite = params.get("skip_nonfinite", False)
+    warmup = params.get("warmup_steps", 0)
+    x_tr, y_tr, x_val, y_val = (_preload(a, device) for a in (x_tr, y_tr, x_val, y_val))
+    val0 = mse(model, x_val, y_val, device, loss_fn=loss_fn)
+    log_epoch("val loss до обучения (нулевой выход: у гибрида = IMM): %.4f", val0)
+    finished = False
+    if ckpt_path is not None and Path(ckpt_path).exists():
+        ck = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+        model.load_state_dict(ck["model"])
+        opt.load_state_dict(ck["opt"])
+        history, val0, best_val, best_state, bad = ck["history"], ck["val0"], ck["best_val"], ck["best_state"], ck["bad"]
+        rng.bit_generator.state = ck["rng"]
+        torch.set_rng_state(ck["torch_rng"])
+        finished = ck["finished"]
+        log.info("Продолжение обучения с эпохи %d (контрольная точка %s)", len(history) + 1, ckpt_path)
+    for epoch in range(len(history) + 1, params["epochs"] + 1):
+        if finished:
+            break
+        model.train()
+        t0 = time.time()
+        total, n, skipped = torch.zeros((), dtype=torch.float64, device=device), 0, 0
+        step = (epoch - 1) * -(-len(x_tr) // params["batch"])     # номер шага с начала обучения (и после продолжения)
+        for idx in _batches(len(x_tr), params["batch"], rng):
+            xb, yb = _rows(x_tr, idx, device), _rows(y_tr, idx, device)
+            if warmup:
+                step += 1
+                for group in opt.param_groups:
+                    group["lr"] = params["lr"] * min(1.0, step / warmup)
+            opt.zero_grad()
+            loss = (loss_fn or _mse_loss)(model(xb), yb)
+            loss.backward()
+            norm = nn.utils.clip_grad_norm_(model.parameters(), params.get("clip", 1.0))
+            if skip_nonfinite and not bool(torch.isfinite(loss) & torch.isfinite(norm)):
+                skipped += 1
+                continue
+            opt.step()
+            total += loss.detach().double() * len(idx)
+            n += len(idx)
+        train_loss = float(total) / n if n else float("nan")
+        val_loss = mse(model, x_val, y_val, device, loss_fn=loss_fn)
+        history.append({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss,
+                        "seconds": time.time() - t0, "skipped": skipped})
+        log_epoch("эпоха %3d: train %.4f, val %.4f, %.1f с", epoch, train_loss, val_loss, time.time() - t0)
+        if skipped:
+            log.warning("эпоха %3d: пропущено %d батчей с nan/inf в loss или градиенте", epoch, skipped)
+        if val_loss < best_val - 1e-5:
+            best_val, bad = val_loss, 0
+            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
+        else:
+            bad += 1
+            if bad >= params["patience"]:
+                log_epoch("ранняя остановка: val не улучшался %d эпох", bad)
+                finished = True
+        if ckpt_path is not None:
+            _save_checkpoint(Path(ckpt_path), model, opt, history, val0, best_val, best_state, bad, rng, finished)
+        if finished:
+            break
+    if best_state is not None:
+        model.load_state_dict(best_state)
+    return {"val_loss_initial": val0, "best_val_loss": best_val, "epochs": history}, best_state

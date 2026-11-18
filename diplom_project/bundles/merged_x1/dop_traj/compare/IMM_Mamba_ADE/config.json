@@ -1,0 +1,67 @@
+{
+ "case": "dop_traj",
+ "method": "stage2/IMM+Mamba",
+ "label": "IMM+Mamba (выход под ADE)",
+ "title": "IMM+Mamba, выход под ADE",
+ "note": "корректор этапа 2; веса выходного слоя пересчитаны под ADE на train без обучения сети (diplom_backup/weight_surgery, шаг 7, 08.11.2026)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.3299405583450013,
+  "FILTER_SIGMA_A_CT": 2.346787531982524,
+  "FILTER_SIGMA_W_CT": 0.005614633922822615,
+  "IMM_P_STAY": 0.969109809481554,
+  "DOPPLER_IN_IMM": true,
+  "DOPPLER_IN_NET": true,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": 0.5
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [],
+ "corrector": "Mamba",
+ "hp": {
+  "hidden": 64,
+  "layers": 2,
+  "dropout": 0.12311487691068891
+ },
+ "response_ms": {
+  "imm_ms": 0.25332130258271074,
+  "net_cpu_ms": 1.583100005518645,
+  "net_gpu_ms": 4.073250020155683,
+  "total_cpu_ms": 1.8364213081013558,
+  "total_gpu_ms": 4.326571322738394
+ },
+ "run": "merged_x1",
+ "role": "compare",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   58.89936230891125,
+   79.59930512645919,
+   109.25722957759982,
+   148.57447773243186,
+   189.75589205423927
+  ],
+  "r_multi": null
+ }
+}

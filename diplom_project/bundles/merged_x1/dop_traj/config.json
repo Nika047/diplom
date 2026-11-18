@@ -1,0 +1,90 @@
+{
+ "case": "dop_traj",
+ "method": "stage6/ADE",
+ "label": "ADE",
+ "title": "Итоговая модель: IMM+Transformer, потери ADE вместо MSE",
+ "note": "итоговая модель случая (этап 7)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.3299405583450013,
+  "FILTER_SIGMA_A_CT": 2.346787531982524,
+  "FILTER_SIGMA_W_CT": 0.005614633922822615,
+  "IMM_P_STAY": 0.969109809481554,
+  "DOPPLER_IN_IMM": true,
+  "DOPPLER_IN_NET": true,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": 0.5
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [
+  "ade"
+ ],
+ "corrector": "Transformer",
+ "hp": {
+  "hidden": 64,
+  "layers": 2,
+  "dropout": 0.10753971856328177
+ },
+ "response_ms": {
+  "imm_ms": 0.25669457261378564,
+  "net_cpu_ms": 0.19404999329708517,
+  "net_gpu_ms": 0.437700015027076,
+  "total_cpu_ms": 0.4507445659108708,
+  "total_gpu_ms": 0.6943945876408617
+ },
+ "run": "merged_x1",
+ "role": "final",
+ "multi": {
+  "seed": 42,
+  "file": "multi_42.pt",
+  "method": "stage6/гипотезы",
+  "override": {
+   "FILTER_SIGMA_A_CV": 0.3299405583450013,
+   "FILTER_SIGMA_A_CT": 2.346787531982524,
+   "FILTER_SIGMA_W_CT": 0.005614633922822615,
+   "IMM_P_STAY": 0.969109809481554,
+   "DOPPLER_IN_IMM": true,
+   "DOPPLER_IN_NET": true,
+   "DOPPLER_TRUTH": "positions",
+   "FILTER_SIGMA_VR": 0.5
+  }
+ },
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   58.18388096211337,
+   78.29221504102254,
+   110.80608621454158,
+   150.31396203538466,
+   196.01808404788758
+  ],
+  "r_multi": [
+   49.66802203998994,
+   62.38308233409929,
+   79.6174727292831,
+   100.14047348214343,
+   122.53572286432824
+  ]
+ }
+}

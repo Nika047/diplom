@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Схемы моделей</title>
+<style>
+  :root {
+    --bg: #fafaf7; --card: #ffffff; --ink: #1d232a; --muted: #5d6670; --line: #d8dbe0;
+    --radar: #e8eef7; --radar-b: #5b7db1; --imm: #fdecea; --imm-b: #c0392b;
+    --net: #e8f5e9; --net-b: #2e7d32; --op: #fff8e1; --op-b: #b7950b;
+    --out: #f3e5f5; --out-b: #7b1fa2; --dop: #e0f7fa; --dop-b: #00838f;
+    --best: #2e7d32;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.5 "Segoe UI", Roboto, Arial, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  h2 { font-size: 19px; margin: 0 0 4px; }
+  .lead { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+          padding: 18px 18px 14px; margin: 0 0 18px; }
+  .tag { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 10px;
+         background: #eef0f3; color: var(--muted); margin-right: 6px; }
+  .tag.win { background: #e3f1e4; color: var(--best); font-weight: 600; }
+  .data { color: var(--muted); font-size: 14px; margin: 6px 0 8px; }
+  svg { width: 100%; height: auto; display: block; margin: 6px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; margin-top: 6px; }
+  th, td { border-bottom: 1px solid var(--line); padding: 5px 8px; text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.hl td { font-weight: 600; color: var(--best); }
+  .note { font-size: 14px; color: var(--muted); margin: 8px 0 0; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 13px; color: var(--muted); }
+  .sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px;
+        margin-right: 6px; border: 1.5px solid; }
+  .bars .row { display: grid; grid-template-columns: minmax(150px, 330px) 1fr 52px; gap: 8px;
+               align-items: center; margin: 4px 0; font-size: 14px; }
+  .bars .bar { height: 14px; background: #b0bec5; border-radius: 3px; }
+  .bars .bar.d { background: #4db6ac; } .bars .bar.f { background: var(--best); }
+  @media (max-width: 640px) { .bars .row { grid-template-columns: 1fr 70px 46px; } }
+  .wrap { overflow-x: auto; }
+  td.c { text-align: center; }
+</style>
+</head>
+<body>
+<main>
+<h1>Как устроены модели и что они дали</h1>
+<p class="lead">Версия 2, главный прогон <b>merged_x1</b>: от фильтра IMM к итоговой модели. Для каждой модели -
+схема, этап, на котором она сделана, и ошибка на test в трёх случаях доплера. Источник чисел -
+<code>home_results/merged_x1/</code> и <code>.agent_docs/RESULTS_V2.md</code> (выгрузка 04.11.2026).</p>
+
+<div class="card">
+  <h2>Как читать числа</h2>
+  <p class="data">Число - <b>ADE на test, м</b>: средняя ошибка прогноза по горизонтали (на сколько метров прогноз
+  положения через 2, 4, 6, 8 и 10 с в среднем отличается от настоящего). Чем меньше, тем лучше. У сетей - среднее
+  по 3 обучениям с разными seed (42, 43, 44). Test - 272 трассы: 25 реальных полётов и 247 сгенерированных
+  траекторий.</p>
+  <p class="data"><b>Три столбца - три случая доплера:</b> без доплера / доплер по траектории (радиальная скорость
+  по трём последним GPS-точкам) / доплер по телеметрии (по скорости GPS-приёмника из лога). У сгенерированных
+  траекторий телеметрии нет, доплер у них всегда «по траектории» - поэтому два последних случая различаются только
+  на реальных полётах.</p>
+  <p class="data"><b>Данные обучения во всех схемах:</b> реальные полёты train + их расширение (переразметка РЛС,
+  зеркальное отражение, растяжение по скорости) + сгенерированные траектории.</p>
+  <p class="data"><b>Время отклика</b> (мс на обзор) - шаг IMM плюс проход сети по одному окну, на процессоре (CPU).</p>
+  <div class="legend">
+    <span><span class="sw" style="background:var(--radar);border-color:var(--radar-b)"></span>измерения РЛС</span>
+    <span><span class="sw" style="background:var(--imm);border-color:var(--imm-b)"></span>фильтр (IMM, Калман)</span>
+    <span><span class="sw" style="background:var(--dop);border-color:var(--dop-b)"></span>доплер</span>
+    <span><span class="sw" style="background:var(--net);border-color:var(--net-b)"></span>нейросеть</span>
+    <span><span class="sw" style="background:var(--op);border-color:var(--op-b)"></span>сложение, среднее, выбор</span>
+    <span><span class="sw" style="background:var(--out);border-color:var(--out-b)"></span>прогноз</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>1. Классические методы и IMM</h2>
+  <span class="tag">этап 1</span>
+  <p class="data">Без обучения. IMM - два фильтра Калмана (CV - прямолинейное движение, CT - разворот), которые
+  работают одновременно, и вероятности, какая модель сейчас верна. Параметры IMM и фильтра Калмана подобраны
+  генетическим алгоритмом (NSGA-II) на train; в случаях с доплером подбирается и доверие фильтра к доплеру.</p>
+  <svg id="s1" viewBox="0 0 900 150"></svg>
+  <div class="wrap"><table><tr><th>Метод</th><th class="c">без доплера</th><th class="c">по траектории</th><th class="c">по телеметрии</th></tr>
+    <tr><td>Линейная экстраполяция по отметкам</td><td class="n">83,5</td><td class="n">83,5</td><td class="n">83,5</td></tr>
+    <tr><td>Фильтр Калмана (CV), подобранный</td><td class="n">67,2</td><td class="n">61,2</td><td class="n">62,0</td></tr>
+    <tr><td>IMM с параметрами по умолчанию</td><td class="n">57,3</td><td class="n">51,6</td><td class="n">54,1</td></tr>
+    <tr class="hl"><td>IMM (CV + CT), подобранный - точка отсчёта</td><td class="n">49,5</td><td class="n">48,5</td><td class="n">49,1</td></tr>
+  </table></div>
+  <p class="note">Подбор параметров сам по себе снижает ошибку IMM на 6-14% (в статьях-аналогах IMM обычно не
+  подбирают). Доплер в самом IMM почти не помогает: 49,5 против 49,1 (различие не доказано).</p>
+</div>
+
+<div class="card">
+  <h2>2. Схема A: IMM + нейросеть - сеть поправляет прогноз фильтра</h2>
+  <span class="tag">этап 2</span><span class="tag">основа всех следующих схем</span>
+  <p class="data">Сеть видит окно из 20 последних обзоров: отметки, оценки и скорости IMM, вероятности моделей,
+  невязки (в случаях с доплером - и радиальную скорость). Сеть выдаёт не положение, а <b>поправку</b> к прогнозу IMM;
+  итог = прогноз IMM + поправка. Гиперпараметры каждой сети подобраны генетическим алгоритмом по двум целям -
+  точность на val и время отклика (30 попыток на модель).</p>
+  <svg id="s2" viewBox="0 0 900 180"></svg>
+  <div class="wrap"><table><tr><th>Корректор</th><th class="c">без доплера</th><th class="c">по траектории</th><th class="c">по телеметрии</th><th class="c">мс CPU</th></tr>
+    <tr><td>IMM + LSTM</td><td class="n">40,8</td><td class="n">36,5</td><td class="n">37,0</td><td class="n">0,35-0,52</td></tr>
+    <tr><td>IMM + GRU</td><td class="n">40,8</td><td class="n">36,7</td><td class="n">36,7</td><td class="n">0,80-1,02</td></tr>
+    <tr><td>IMM + Transformer</td><td class="n">40,8</td><td class="n">36,0</td><td class="n">36,5</td><td class="n">0,44</td></tr>
+    <tr><td>IMM + Mamba</td><td class="n">41,0</td><td class="n">36,3</td><td class="n">36,7</td><td class="n">1,83-2,57</td></tr>
+    <tr><td>GRU без IMM (сеть по одним отметкам)</td><td class="n">43,4</td><td class="n">36,7</td><td class="n">37,1</td><td class="n">0,75-0,89</td></tr>
+    <tr><td>Mamba без IMM</td><td class="n">43,5</td><td class="n">37,3</td><td class="n">37,8</td><td class="n">1,82-2,34</td></tr>
+    <tr><td>LSTM без IMM</td><td class="n">43,0</td><td class="n">36,8</td><td class="n">36,5</td><td class="n">0,33-0,34</td></tr>
+    <tr><td>Transformer без IMM</td><td class="n">43,5</td><td class="n">37,5</td><td class="n">37,2</td><td class="n">0,25-0,46</td></tr>
+  </table></div>
+  <p class="note">Тип сети на точность не влияет (разброс 0,2-0,7 м), на время - да: Mamba в 4-6 раз медленнее.
+  Без доплера сеть без IMM заметно хуже гибрида (выигрыш к IMM 12-13% против 17-18%). С радиальной скоростью во входе
+  лучшая из них (LSTM) равна гибриду (36,5 м по телеметрии): точнее на маневре, хуже на прямой и на реальных полётах.</p>
+</div>
+
+<div class="card">
+  <h2>3. Доплер: радиальная скорость в IMM и во входе сети</h2>
+  <span class="tag">этапы 1-2, все этапы в трёх случаях</span>
+  <p class="data">РЛС кроме положения измеряет <b>радиальную скорость</b> - скорость приближения к РЛС. Она
+  уточняет скорость цели в IMM и подаётся во вход сети (пунктир). Истинная радиальная скорость для моделирования
+  РЛС берётся либо по GPS-траектории, либо по скорости GPS-приёмника из телеметрии.</p>
+  <svg id="s5" viewBox="0 0 900 180"></svg>
+  <div class="wrap"><table><tr><th>Модель</th><th class="c">без доплера</th><th class="c">по траектории</th><th class="c">по телеметрии</th></tr>
+    <tr><td>IMM, подобранный</td><td class="n">49,5</td><td class="n">48,5</td><td class="n">49,1</td></tr>
+    <tr class="hl"><td>Итоговая модель случая</td><td class="n">40,8 (IMM + LSTM)</td><td class="n">36,0 (IMM + Transformer)</td><td class="n">36,5 (IMM + Transformer)</td></tr>
+  </table></div>
+  <p class="note">С доплером итоговая модель лучше на 10% (по телеметрии против без доплера: -4,25 м, интервал
+  [-4,84; -3,68]). Выигрыш даёт прежде всего доплер во <b>входе сети</b>: при поиске архитектуры группа «доплер»
+  была в 94-100% лучших попыток, а сам IMM от доплера почти не выигрывает.</p>
+</div>
+
+<div class="card">
+  <h2>4. Поиск архитектуры: стопка блоков и отбор признаков</h2>
+  <span class="tag">этап 4</span>
+  <p class="data">Генетический алгоритм собирает сеть из 1-3 блоков (GRU, LSTM, Mamba, внимание), выбирает ширину и
+  какие группы признаков подавать (отметки, оценки IMM, скорости IMM, невязки, вероятности моделей, NIS, дальность,
+  доплер). 80 попыток, две цели - точность и время.</p>
+  <svg id="s4" viewBox="0 0 900 170"></svg>
+  <div class="wrap"><table><tr><th>Модель</th><th class="c">без доплера</th><th class="c">по траектории</th><th class="c">по телеметрии</th></tr>
+    <tr><td>Лучшая найденная стопка</td><td class="n">40,5<br><small>GRU + внимание</small></td><td class="n">36,4<br><small>GRU + Mamba + внимание</small></td><td class="n">36,6<br><small>LSTM + LSTM + внимание</small></td></tr>
+    <tr><td>Корректор этапа 2 (IMM + GRU)</td><td class="n">40,8</td><td class="n">36,7</td><td class="n">36,7</td></tr>
+  </table></div>
+  <p class="note">Значимого выигрыша над простым корректором нет. Полезное следствие - какие признаки нужны: оценки
+  IMM, невязки, доплер; вероятности моделей и NIS выбирались не чаще случайного.</p>
+</div>
+
+<div class="card">
+  <h2>5. Схемы встраивания сети в фильтр (схемы Б)</h2>
+  <span class="tag">этап 5</span>
+  <p class="data">Сеть не только поправляет итог, но и меняет работу самого фильтра. Ниже - пример Б1: сеть
+  выбирает, какой модели IMM верить.</p>
+  <svg id="s3" viewBox="0 0 900 175"></svg>
+  <div class="wrap"><table><tr><th>Схема</th><th>Как работает</th><th class="c">без доплера</th><th class="c">по траектории</th><th class="c">по телеметрии</th></tr>
+    <tr><td>A. Сеть после IMM</td><td>схема из п. 2 (корректор IMM + GRU)</td><td class="n">40,8</td><td class="n">36,7</td><td class="n">36,7</td></tr>
+    <tr><td>A + Б1</td><td>одна сеть с двумя выходами: заново смешивает прогнозы CV и CT и добавляет поправку</td><td class="n">40,7</td><td class="n">36,4</td><td class="n">36,6</td></tr>
+    <tr><td>Б4 + A</td><td>классификатор маневра сдвигает вероятности моделей внутри IMM, поверх - поправка схемы A</td><td class="n">40,7</td><td class="n">36,5</td><td class="n">36,8</td></tr>
+    <tr><td>Б5</td><td>прогноз схемы A - третья модель IMM рядом с CV и CT</td><td class="n">44,2</td><td class="n">46,8</td><td class="n">44,7</td></tr>
+    <tr><td>Б1</td><td>сеть вместо IMM решает, с какими весами смешивать CV и CT; поправки нет</td><td class="n">46,8</td><td class="n">46,2</td><td class="n">44,1</td></tr>
+    <tr><td>Б4</td><td>классификатор маневра сдвигает вероятности моделей внутри IMM; поправки нет</td><td class="n">48,9</td><td class="n">48,9</td><td class="n">47,6</td></tr>
+    <tr><td>Б2</td><td>фильтр Калмана (CV), сеть на каждом обзоре поправляет коэффициент усиления (идея KalmanNet)</td><td class="n">61,3</td><td class="n">55,3</td><td class="n">57,2</td></tr>
+    <tr><td>Б3</td><td>тот же фильтр, сеть задаёт шум ускорения</td><td class="n">62,2</td><td class="n">58,5</td><td class="n">61,5</td></tr>
+  </table></div>
+  <p class="note">Сеть, которая только управляет фильтром, хуже сети, которая поправляет его прогноз; сеть внутри
+  фильтра Калмана хуже даже IMM. При этом в Б4 сеть распознаёт маневр лучше IMM (AP 0,92-0,96 против 0,86-0,90),
+  но переключение IMM по ней прогноз не улучшает. <b>Основа</b> для следующих шагов - лучшая по val, а среди
+  статистически равных ей - самая быстрая: IMM + LSTM без доплера, IMM + Transformer с доплером.</p>
+</div>
+
+<div class="card">
+  <h2>6. Гипотезы против основы</h2>
+  <span class="tag">этапы 6-7</span>
+  <p class="data">Каждая гипотеза проверялась по одной против основы. Гипотеза проходит, только если 95% интервал
+  разности ошибки с основой на val (бутстреп по полётам) целиком меньше нуля. Прошедшие объединялись бы в сочетания
+  (этап 7).</p>
+  <svg id="s9" viewBox="0 0 900 210"></svg>
+  <div class="wrap"><table><tr><th>Модель</th><th class="c">без доплера</th><th class="c">по траектории</th><th class="c">по телеметрии</th><th>решение по val</th></tr>
+    <tr><td>Основа</td><td class="n">40,8</td><td class="n">36,0</td><td class="n">36,5</td><td></td></tr>
+    <tr><td>Три варианта прогноза с вероятностями</td><td class="n">40,4</td><td class="n">35,9</td><td class="n">36,8</td><td>не доказано</td></tr>
+    <tr><td>Модульная: распознаватель + 2 эксперта</td><td class="n">40,3</td><td class="n">36,3</td><td class="n">37,3</td><td>не доказано / хуже</td></tr>
+    <tr><td>Прогноз начала маневра (доп. выход)</td><td class="n">41,3</td><td class="n">36,4</td><td class="n">37,0</td><td>значимо хуже</td></tr>
+    <tr><td>Вес ошибкам на входе в маневр x3</td><td class="n">43,6</td><td class="n">38,2</td><td class="n">38,5</td><td>значимо хуже</td></tr>
+  </table></div>
+  <p class="note">Ни одна гипотеза не прошла; сочетаний нет, итоговая модель = основа. Вес улучшает только сам вход
+  в маневр (100,2 против 106,7 м без доплера) ценой остального.</p>
+  <p class="data"><b>Но три варианта прогноза полезны как область, а не как точка.</b> Если бы знать, какой вариант
+  верен, ошибка была бы 30,9 / 28,3 / 28,7 м (на 21-24% меньше); на входе в маневр - 67 против 113 м. Строб на 10 с
+  из трёх кругов при том же покрытии 95% <b>на 26-36% меньше по площади</b>, чем один круг, и лучше накрывает вход
+  в маневр (0,74-0,78 против 0,69-0,73).</p>
+</div>
+
+<div class="card">
+  <h2>7. Ансамбль</h2>
+  <span class="tag">этап 8</span>
+  <p class="data"><b>Без нового обучения:</b> из всех уже обученных сетей случая жадно, по val, набираются 3-4,
+  чьё среднее поправок лучше всего. В них всегда попадают сети разного устройства (схемы A + Б1 и Б4 + A, сети
+  гипотез «три варианта» и «модульная»): они ошибаются по-разному, и среднее гасит ошибки.</p>
+  <svg id="s7" viewBox="0 0 900 290"></svg>
+  <div class="wrap"><table><tr><th>Модель</th><th class="c">без доплера</th><th class="c">по траектории</th><th class="c">по телеметрии</th></tr>
+    <tr><td>Итоговая модель (одна сеть, потери ADE)</td><td class="n">38,8</td><td class="n">34,5</td><td class="n">34,9</td></tr>
+    <tr><td>Ансамбль 3 seed итоговой</td><td class="n">38,2</td><td class="n">33,6</td><td class="n">34,2</td></tr>
+    <tr class="hl"><td>Жадный ансамбль</td><td class="n">38,3</td><td class="n">33,2</td><td class="n">33,6</td></tr>
+    <tr><td>Время жадного ансамбля, мс CPU</td><td class="n">0,69</td><td class="n">1,32</td><td class="n">0,99</td></tr>
+  </table></div>
+  <p class="note">Ещё 1-4% точности ценой времени: 0,7-1,3 мс на обзор против 0,45 у одной сети (при обзоре
+  раз в 2 с это всё равно мало). В ансамбли с доплером входят и сети без IMM (LSTM): они ошибаются иначе, чем гибриды.
+  До гипотезы ADE (итоговая на MSE) жадный ансамбль давал 38,8 / 33,7 / 34,0.</p>
+</div>
+
+<div class="card">
+  <h2>Итог (test, м, 95% интервал по полётам)</h2>
+  <div class="wrap"><table><tr><th>Случай</th><th>IMM</th><th>Итоговая модель</th><th>Ансамбль</th></tr>
+    <tr><td>без доплера</td><td class="n">49,5 [46,5; 52,6]</td><td class="n">38,8 [36,6; 41,3] (-22%)</td><td class="n">38,3 [36,1; 40,7]</td></tr>
+    <tr><td>доплер по траектории</td><td class="n">48,5 [44,7; 52,5]</td><td class="n">34,5 [32,4; 36,8] (-29%)</td><td class="n">33,2 [31,1; 35,6]</td></tr>
+    <tr class="hl"><td>доплер по телеметрии</td><td class="n">49,1 [45,9; 52,5]</td><td class="n">34,9 [32,9; 37,1] (-29%)</td><td class="n">33,6 [31,8; 35,6]</td></tr>
+  </table></div>
+  <p class="note">Итоговая модель - корректор, обученный на потерях ADE вместо MSE (единственная гипотеза этапа 6,
+  прошедшая отбор; к корректору на MSE -4...-5%). К IMM с параметрами по умолчанию: -32 / -33 / -36%; к фильтру
+  Калмана: -42 / -44 / -44%; на участке маневра к подобранному IMM: -42 / -54 / -51%. Все разности значимы. Разложение ошибки (этап 9):
+  шум РЛС 57-62%, метод 10-11%, непредсказуемость маневра 28-32%.</p>
+  <p class="data"><b>Путь к итоговой модели</b> (доплер по телеметрии, test, м):</p>
+  <div class="bars" id="bars"></div>
+</div>
+</main>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const C = {
+  radar: ["var(--radar)", "var(--radar-b)"], imm: ["var(--imm)", "var(--imm-b)"],
+  dop: ["var(--dop)", "var(--dop-b)"], net: ["var(--net)", "var(--net-b)"],
+  op: ["var(--op)", "var(--op-b)"], out: ["var(--out)", "var(--out-b)"], data: ["#f4f4f4", "#9e9e9e"]
+};
+function el(svg, tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  svg.appendChild(e);
+  return e;
+}
+function defs(svg) {
+  const d = el(svg, "defs", {});
+  const m = document.createElementNS(NS, "marker");
+  for (const [k, v] of Object.entries({id: svg.id + "a", viewBox: "0 0 10 10", refX: 9, refY: 5,
+       markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse"})) m.setAttribute(k, v);
+  const p = document.createElementNS(NS, "path");
+  p.setAttribute("d", "M0,0 L10,5 L0,10 z"); p.setAttribute("fill", "#555");
+  m.appendChild(p); d.appendChild(m);
+}
+// box: x, y - левый верхний угол; lines - строки текста
+function box(svg, x, y, w, h, kind, lines, round) {
+  el(svg, "rect", {x, y, width: w, height: h, rx: round ? h / 2 : 7, fill: C[kind][0], stroke: C[kind][1],
+                   "stroke-width": 1.8});
+  const n = lines.length, lh = 17, y0 = y + h / 2 - (n - 1) * lh / 2 + 5;
+  lines.forEach((t, i) => el(svg, "text", {x: x + w / 2, y: y0 + i * lh, "text-anchor": "middle",
+    "font-size": i === 0 && h >= 30 ? 14 : 12, "font-weight": i === 0 ? 600 : 400, fill: "#1d232a"}, t));
+  return {x, y, w, h, cx: x + w / 2, cy: y + h / 2, r: x + w, b: y + h};
+}
+// seg - номер отрезка ломаной, над которым подпись (по умолчанию последний)
+function arrow(svg, pts, label, dashed, seg) {
+  el(svg, "polyline", {points: pts.map(p => p.join(",")).join(" "), fill: "none", stroke: "#555",
+    "stroke-width": 1.6, "marker-end": `url(#${svg.id}a)`, "stroke-dasharray": dashed ? "5 4" : ""});
+  if (label) {
+    const j = seg === undefined ? pts.length - 2 : seg;
+    const [a, b] = [pts[j], pts[j + 1]];
+    el(svg, "text", {x: (a[0] + b[0]) / 2, y: (a[1] + b[1]) / 2 - 6, "text-anchor": "middle", "font-size": 11,
+      fill: "#5d6670"}, label);
+  }
+}
+function plus(svg, x, y) {
+  el(svg, "circle", {cx: x, cy: y, r: 16, fill: C.op[0], stroke: C.op[1], "stroke-width": 1.8});
+  el(svg, "text", {x, y: y + 6, "text-anchor": "middle", "font-size": 20, "font-weight": 700, fill: "#1d232a"}, "+");
+  return {cx: x, cy: y, x: x - 16, r: x + 16, y: y - 16, b: y + 16};
+}
+const S = id => { const s = document.getElementById(id); defs(s); return s; };
+
+// 1. IMM
+(() => { const s = S("s1");
+  const r = box(s, 20, 45, 150, 60, "radar", ["Отметки РЛС", "дальность, азимут,", "угол места"]);
+  const f = box(s, 250, 25, 300, 100, "imm", ["IMM", "фильтр CV (прямая)", "фильтр CT (разворот)", "+ вероятности моделей"]);
+  const o = box(s, 640, 45, 230, 60, "out", ["Прогноз положения", "на 2-10 с"], true);
+  arrow(s, [[r.r, r.cy], [f.x, f.cy]]); arrow(s, [[f.r, f.cy], [o.x, o.cy]]);
+})();
+
+// 2. Схема A
+function schemeA(id, opts) {
+  const s = S(id); opts = opts || {};
+  const r = box(s, 15, 25, 140, 60, "radar", ["Отметки РЛС"].concat(opts.dop ? ["+ радиальная", "скорость"] : []));
+  if (opts.dop) el(s, "rect", {x: 15, y: 25, width: 140, height: 60, rx: 7, fill: "none", stroke: C.dop[1],
+                               "stroke-width": 3});
+  const f = box(s, 225, 25, 170, 60, opts.dop ? "dop" : "imm", opts.dop ? ["IMM с доплером", "CV + CT"] : ["IMM", "CV + CT"]);
+  const p = plus(s, 640, 55);
+  const o = box(s, 710, 30, 170, 50, "out", ["Итоговый прогноз"], true);
+  const n = box(s, 445, 110, 150, 60, "net", [opts.net || "LSTM / GRU /", opts.net2 || "Transformer / Mamba"]);
+  arrow(s, [[r.r, r.cy], [f.x, f.cy]]);
+  arrow(s, [[f.r, f.cy], [p.x, p.cy]], "прогноз IMM");
+  arrow(s, [[f.cx, f.b], [f.cx, n.cy], [n.x, n.cy]], "окно 20 обзоров");
+  arrow(s, [[n.r, n.cy], [p.cx, n.cy], [p.cx, p.b]], "поправка");
+  arrow(s, [[p.r, p.cy], [o.x, o.cy]]);
+  if (opts.dopNet) arrow(s, [[r.cx, r.b], [r.cx, 155], [n.x, 155]], "радиальная скорость", true);
+  return s;
+}
+schemeA("s2");
+schemeA("s5", {dop: true, dopNet: true});
+
+// 4. Поиск архитектуры
+(() => { const s = S("s4");
+  const f = box(s, 15, 55, 120, 60, "imm", ["IMM", "признаки"]);
+  const g = box(s, 175, 20, 190, 130, "op", ["Отбор групп признаков", "отметки, оценки IMM,", "скорости, невязки,", "вероятности, NIS,", "дальность, доплер"]);
+  const b1 = box(s, 410, 20, 150, 36, "net", ["блок 1: GRU / LSTM"]);
+  const b2 = box(s, 410, 67, 150, 36, "net", ["блок 2: Mamba"]);
+  const b3 = box(s, 410, 114, 150, 36, "net", ["блок 3: внимание"]);
+  const h = box(s, 600, 60, 110, 50, "net", ["выход:", "поправка"]);
+  const o = box(s, 750, 60, 140, 50, "out", ["+ прогноз IMM"], true);
+  arrow(s, [[f.r, f.cy], [g.x, f.cy]]);
+  arrow(s, [[g.r, b1.cy], [b1.x, b1.cy]]);
+  arrow(s, [[b1.cx, b1.b], [b2.cx, b2.y]]); arrow(s, [[b2.cx, b2.b], [b3.cx, b3.y]]);
+  arrow(s, [[b3.r, b3.cy], [580, b3.cy], [580, h.cy], [h.x, h.cy]]);
+  arrow(s, [[h.r, h.cy], [o.x, o.cy]]);
+  el(s, "text", {x: 485, y: 166, "text-anchor": "middle", "font-size": 11, fill: "#5d6670"}, "1-3 блока, тип и ширину выбирает генетический алгоритм");
+})();
+
+// 5. Сеть внутри фильтра (Б1)
+(() => { const s = S("s3");
+  const r = box(s, 20, 70, 140, 60, "radar", ["Отметки РЛС"]);
+  const f = box(s, 260, 50, 300, 100, "imm", ["IMM", "веса моделей CV и CT", "задаёт сеть"]);
+  const nn = box(s, 640, 45, 120, 45, "net", ["сеть"]);
+  const o = box(s, 640, 115, 230, 50, "out", ["Прогноз (без поправки)"], true);
+  arrow(s, [[r.r, r.cy], [f.x, f.cy]]);
+  arrow(s, [[f.r, nn.cy], [nn.x, nn.cy]], "признаки");
+  arrow(s, [[nn.cx, nn.y], [nn.cx, 20], [f.cx, 20], [f.cx, f.y]], "веса моделей", false, 1);
+  arrow(s, [[f.r, o.cy], [o.x, o.cy]]);
+})();
+
+// 6. Гипотезы и модульная схема
+(() => { const s = S("s9");
+  el(s, "text", {x: 10, y: 18, "font-size": 13, "font-weight": 600, fill: "#1d232a"}, "Три варианта прогноза");
+  const f = box(s, 10, 40, 110, 50, "imm", ["IMM"]);
+  const n = box(s, 150, 40, 120, 50, "net", ["сеть основы"]);
+  const h = ["прямо", "влево", "вправо"].map((t, i) => box(s, 300, 28 + i * 26, 160, 22, "out", [`${t} + вероятность`]));
+  arrow(s, [[f.r, f.cy], [n.x, n.cy]]);
+  h.forEach(b => arrow(s, [[n.r, n.cy], [285, n.cy], [285, b.cy], [b.x, b.cy]]));
+  el(s, "text", {x: 480, y: 18, "font-size": 13, "font-weight": 600, fill: "#1d232a"}, "Модульная схема");
+  const f2 = box(s, 480, 75, 100, 50, "imm", ["IMM"]);
+  const rec = box(s, 610, 30, 150, 40, "net", ["Распознаватель:", "будет поворот?"]);
+  const e1 = box(s, 610, 85, 150, 36, "net", ["Эксперт «прямая»"]);
+  const e2 = box(s, 610, 130, 150, 36, "net", ["Эксперт «поворот»"]);
+  const sw = box(s, 790, 90, 95, 56, "op", ["Выбор", "эксперта"]);
+  [rec, e1, e2].forEach(b => arrow(s, [[f2.r, f2.cy], [595, f2.cy], [595, b.cy], [b.x, b.cy]]));
+  [e1, e2].forEach(b => arrow(s, [[b.r, b.cy], [sw.x, b.cy < sw.cy ? sw.y + 15 : sw.b - 15]]));
+  arrow(s, [[rec.r, rec.cy], [sw.cx, rec.cy], [sw.cx, sw.y]], "p");
+  el(s, "text", {x: 10, y: 190, "font-size": 12, fill: "#5d6670"},
+     "Ещё две гипотезы на той же схеме A: вес ошибкам на входе в маневр (x3 или x10) и дополнительный выход «скоро начнётся маневр».");
+})();
+
+// 7. Жадный ансамбль
+(() => { const s = S("s7");
+  const r = box(s, 15, 125, 130, 60, "radar", ["Отметки РЛС"]);
+  const f = box(s, 185, 125, 140, 60, "imm", ["IMM", "(с доплером - IMM", "с доплером)"]);
+  const names = [["схема A + Б1"], ["сеть «три варианта»"], ["модульная схема"], ["... ещё сеть (до 6)"]];
+  const nets = names.map((t, i) => box(s, 395, 40 + i * 58, 185, 44, "net", t));
+  const m = box(s, 630, 125, 100, 60, "op", ["Среднее", "поправок"]);
+  const p = plus(s, 790, 155);
+  const o = box(s, 745, 230, 145, 46, "out", ["Итог"], true);
+  arrow(s, [[r.r, r.cy], [f.x, f.cy]]);
+  nets.forEach(n => { arrow(s, [[f.r, f.cy], [360, f.cy], [360, n.cy], [n.x, n.cy]]);
+                      arrow(s, [[n.r, n.cy], [605, n.cy], [605, m.cy], [m.x, m.cy]]); });
+  arrow(s, [[f.cx, f.y], [f.cx, 22], [p.cx, 22], [p.cx, p.y]], "прогноз IMM", false, 1);
+  arrow(s, [[m.r, m.cy], [p.x, p.cy]]);
+  arrow(s, [[p.cx, p.b], [p.cx, o.y]]);
+})();
+
+// Итоговые полосы (доплер по телеметрии, test)
+(() => {
+  const rows = [
+    ["IMM с параметрами по умолчанию", 54.1, ""], ["IMM подобранный (этап 1)", 49.1, ""],
+    ["IMM + Transformer без доплера (этап 2)", 40.8, ""], ["IMM + Transformer с доплером (MSE, этап 2)", 36.5, ""],
+    ["то же на потерях ADE, итоговая", 34.9, "f"], ["жадный ансамбль (этап 8)", 33.6, "d"]];
+  const host = document.getElementById("bars");
+  rows.forEach(([name, v, c]) => {
+    const row = document.createElement("div"); row.className = "row";
+    row.innerHTML = `<span>${name}</span><div><div class="bar ${c}" style="width:${(v / 55 * 100).toFixed(1)}%"></div></div>` +
+                    `<span style="text-align:right">${v.toFixed(1).replace(".", ",")}</span>`;
+    host.appendChild(row);
+  });
+})();
+</script>
+</body>
+</html>

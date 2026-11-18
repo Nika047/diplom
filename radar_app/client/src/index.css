@@ -1,0 +1,636 @@
+/* цвета - только переменные темы Kendo (var(--kendo-color-...)) */
+
+html, body, #root {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    font-family: system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 14px;
+    background: var(--kendo-color-app-surface);
+    color: var(--kendo-color-on-app-surface);
+}
+
+.radar-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+}
+
+.radar-error {
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: var(--kendo-color-error-subtle);
+    color: var(--kendo-color-error-on-subtle);
+}
+
+.radar-info {
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: var(--kendo-color-info-subtle);
+    color: var(--kendo-color-info-on-subtle);
+}
+
+.radar-hint {
+    color: var(--kendo-color-subtle);
+    font-size: 13px;
+}
+
+.radar-hint ul {
+    margin: 4px 0 0;
+    padding-left: 20px;
+}
+
+.radar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* вход */
+
+.radar-login {
+    display: flex;
+    justify-content: center;
+    padding-top: 12vh;
+    height: 100%;
+    box-sizing: border-box;
+    background: var(--kendo-color-base-subtle);
+}
+
+.radar-login__card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 340px;
+    height: fit-content;
+    padding: 24px;
+    border-radius: 8px;
+    background: var(--kendo-color-surface-alt);
+}
+
+.radar-login__title {
+    margin: 0;
+    font-size: 20px;
+}
+
+.radar-login__subtitle {
+    margin-bottom: 8px;
+    color: var(--kendo-color-subtle);
+}
+
+.radar-login__password {
+    display: flex;
+    gap: 4px;
+}
+
+/* оболочка */
+
+.radar-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.radar-shell__title.k-button {
+    font-size: 17px;
+    font-weight: 600;
+    margin-right: 16px;
+}
+
+.radar-shell__menu {
+    gap: 4px;
+}
+
+.radar-shell__menu--active .k-button {
+    font-weight: 600;
+    background: var(--kendo-color-base-subtle);
+}
+
+.radar-shell__user {
+    margin-right: 4px;
+}
+
+.radar-shell__page {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
+
+/* страницы */
+
+.radar-page {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.radar-page__title {
+    margin: 0;
+}
+
+.radar-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 1px solid var(--kendo-color-border);
+    border-radius: 8px;
+    background: var(--kendo-color-surface-alt);
+}
+
+.radar-card h3, .radar-card h4 {
+    margin: 0;
+}
+
+.radar-card--muted {
+    background: var(--kendo-color-base-subtle);
+}
+
+.radar-start {
+    max-width: 900px;
+}
+
+.radar-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.radar-field--short {
+    width: 200px;
+}
+
+.radar-grid {
+    cursor: pointer;
+}
+
+/* страница-таблица на всю высоту: таблица прокручивается сама, колонка действий закреплена */
+
+.radar-page--fill {
+    height: 100%;
+}
+
+.radar-grid--fill {
+    flex: 1;
+    min-height: 240px;
+}
+
+.radar-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.radar-toolbar__title {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.radar-toolbar__count {
+    color: var(--kendo-color-subtle);
+    white-space: nowrap;
+}
+
+.radar-toolbar__actions {
+    margin-left: auto;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+/* окно добавления файла */
+
+.radar-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+/* таблицы */
+
+.radar-table {
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+}
+
+.radar-table th, .radar-table td {
+    padding: 4px 10px;
+    border: 1px solid var(--kendo-color-border);
+    text-align: right;
+}
+
+.radar-table th {
+    background: var(--kendo-color-base-subtle);
+    font-weight: 500;
+}
+
+.radar-table th:first-child, .radar-table td:first-child {
+    text-align: left;
+}
+
+.radar-table__change td {
+    color: var(--kendo-color-subtle);
+}
+
+.radar-table--compact th, .radar-table--compact td {
+    padding: 2px 8px;
+}
+
+/* карта */
+
+.radar-map {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    height: 100%;
+}
+
+.radar-map__label {
+    color: var(--kendo-color-subtle);
+}
+
+.radar-map__box {
+    position: relative;
+    flex: 1;
+    min-height: 420px;
+    overflow: hidden;
+    border: 1px solid var(--kendo-color-border);
+    border-radius: 8px;
+    background: var(--kendo-color-app-surface);
+}
+
+/* у k-map в теме своя высота 600 px: без этого карта не заполняет рамку выше 600 px (во весь экран) */
+.radar-map__box .k-map {
+    height: 100%;
+}
+
+.radar-map__note {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--kendo-color-app-surface) 85%, transparent);
+    color: var(--kendo-color-subtle);
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.radar-map__error {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+}
+
+.radar-map__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    font-size: 12px;
+    color: var(--kendo-color-subtle);
+}
+
+.radar-map__legend i {
+    display: inline-block;
+    width: 16px;
+    height: 3px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.radar-map__legend b {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 5px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.radar-map__legend .radar-map__start {
+    border: 2px solid;
+    background: transparent;
+}
+
+.radar-map__legend .radar-map__dash {
+    height: 0;
+    border-top: 2px dashed;
+}
+
+/* страница запуска: слева заголовок, плеер, карта и то, что под ней; справа - панель параметров, моделей, слоев и вида */
+
+.radar-runpage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    height: 100%;
+    min-height: 0;
+}
+
+.radar-runpage--collapsed {
+    grid-template-columns: minmax(0, 1fr) 40px;
+}
+
+/* место под полосу прокрутки занято всегда: иначе ее появление меняет ширину карты, а смена размера пересоздает карту */
+.radar-runpage__main {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    min-width: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+
+/* плеер и карта: вместе разворачиваются во весь экран */
+.radar-stage {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.radar-stage__bar {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.radar-stage__bar .radar-run__player {
+    flex: 1;
+    min-width: 0;
+}
+
+.radar-stage__full {
+    flex: none;
+    margin-left: auto;
+}
+
+.radar-stage--full {
+    position: fixed;
+    inset: 0;
+    z-index: 1100; /* выше шапки приложения (k-appbar-sticky), ниже выпадающих списков Kendo */
+    padding: 12px;
+    background: var(--kendo-color-app-surface);
+}
+
+.radar-stage--full .radar-runpage__map {
+    flex: 1;
+    min-height: 0;
+}
+
+/* высота задана самой карте, а не вместе с легендой: легенда меняется от галочек слоев и не должна менять размер карты
+   (смена размера пересоздает карту и подгоняет вид заново) */
+.radar-runpage__map .radar-map__box {
+    flex: none;
+    height: 62vh;
+    min-height: 420px;
+}
+
+.radar-stage--full .radar-map__box {
+    flex: 1;
+    height: auto;
+    min-height: 0;
+}
+
+.radar-runpage__side {
+    position: relative;
+    border-left: 1px solid var(--kendo-color-border);
+    background: var(--kendo-color-surface-alt);
+    overflow-y: auto;
+}
+
+.radar-runpage__toggle {
+    position: absolute;
+    top: 6px;
+    left: 4px;
+    z-index: 1;
+}
+
+.radar-runpage__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 12px 16px 40px;
+}
+
+.radar-side__block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--kendo-color-border);
+}
+
+.radar-side__block h4 {
+    margin: 0;
+}
+
+.radar-side__form {
+    gap: 10px;
+}
+
+.radar-side__checks {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.radar-side__sep {
+    width: 100%;
+    margin: 2px 0;
+    border: 0;
+    border-top: 2px solid var(--kendo-color-border);
+}
+
+.radar-side__option {
+    display: flex;
+    flex-direction: column;
+}
+
+/* плеер и графики запуска */
+
+.radar-run__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.radar-run__player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.radar-run__chunk {
+    width: 220px;
+}
+
+.radar-run__speed {
+    width: 80px;
+}
+
+.radar-run__slider {
+    flex: 1;
+    min-width: 240px;
+}
+
+/* состояние - отдельной строкой: его длина меняется на каждом обзоре (участок, пропуск отметки) и в одной строке с
+   ползунком меняла бы его ширину */
+.radar-run__state {
+    flex: 0 0 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--kendo-color-subtle);
+    font-variant-numeric: tabular-nums;
+}
+
+.radar-run__charts {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 12px;
+}
+
+.radar-chart {
+    height: 300px;
+}
+
+.radar-chart--small {
+    height: 340px;
+}
+
+@media (max-width: 1100px) {
+    .radar-run__charts {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* задержки */
+
+.radar-latency__head h4 {
+    margin: 0;
+}
+
+.radar-latency__spacer {
+    flex: 1;
+}
+
+.radar-latency__body {
+    display: grid;
+    grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.radar-latency__chart {
+    height: 320px;
+}
+
+.radar-latency__swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 6px;
+    border-radius: 2px;
+    vertical-align: middle;
+}
+
+.radar-table__total td {
+    font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+    .radar-latency__body {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* сравнение моделей */
+
+.radar-compare__model {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.radar-compare__swatch {
+    display: inline-block;
+    width: 18px;
+    height: 4px;
+    border-radius: 2px;
+}
+
+.radar-compare__swatch--dash {
+    height: 0;
+    border-top: 2px dashed;
+    border-radius: 0;
+}
+
+.radar-compare__hidden td {
+    opacity: 0.45;
+}
+
+/* страница сценария (как FormView в ggnp.ofd.client): слева поля, справа действия; на узком экране - друг под другом */
+
+.radar-formpage {
+    display: grid;
+    grid-template-columns: minmax(0, 760px) 260px;
+    gap: 24px;
+    align-items: start;
+}
+
+.radar-formpage__actions {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--kendo-color-border);
+    border-radius: 8px;
+    background: var(--kendo-color-surface-alt);
+}
+
+@media (max-width: 1100px) {
+    .radar-formpage {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .radar-formpage__actions {
+        position: static;
+    }
+}
+
+.radar-formpage h4 {
+    margin: 8px 0 0;
+}
+
+/* ошибки проверки списком (сценарии) и пример файла */
+
+.radar-errors {
+    margin: 4px 0 0;
+    padding-left: 20px;
+}
+
+.radar-code {
+    max-height: 220px;
+    margin: 0;
+    padding: 8px 12px;
+    overflow: auto;
+    border-radius: 6px;
+    background: var(--kendo-color-surface-alt);
+    font-size: 12px;
+}

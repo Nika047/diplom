@@ -1,0 +1,68 @@
+{
+ "case": "nodop",
+ "method": "stage2/GRU (без IMM)",
+ "label": "GRU (без IMM)",
+ "title": "GRU без IMM",
+ "note": "сеть без IMM этапа 2, итоговые гиперпараметры подбора",
+ "window": 20,
+ "model": "e2e",
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.40306851010595396,
+  "FILTER_SIGMA_A_CT": 2.5466337402463926,
+  "FILTER_SIGMA_W_CT": 0.010443820094525779,
+  "IMM_P_STAY": 0.9745837733891589,
+  "DOPPLER_IN_IMM": false,
+  "DOPPLER_IN_NET": false,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": null
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [],
+ "corrector": "GRU",
+ "hp": {
+  "hidden": 64,
+  "layers": 3,
+  "dropout": 0.1822634555704315
+ },
+ "response_ms": {
+  "imm_ms": 0.0,
+  "net_cpu_ms": 0.7642999989911914,
+  "net_gpu_ms": 0.18304999684914947,
+  "total_cpu_ms": 0.7642999989911914,
+  "total_gpu_ms": 0.18304999684914947
+ },
+ "run": "merged_x1",
+ "role": "extra",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   66.3145402408595,
+   94.25030598921482,
+   132.7111539693825,
+   174.6142779653192,
+   219.1966297528946
+  ],
+  "r_multi": null
+ }
+}

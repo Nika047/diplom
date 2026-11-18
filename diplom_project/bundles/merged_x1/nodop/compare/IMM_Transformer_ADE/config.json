@@ -1,0 +1,67 @@
+{
+ "case": "nodop",
+ "method": "stage2/IMM+Transformer",
+ "label": "IMM+Transformer (выход под ADE)",
+ "title": "IMM+Transformer, выход под ADE",
+ "note": "корректор этапа 2; веса выходного слоя пересчитаны под ADE на train без обучения сети (diplom_backup/weight_surgery, шаг 7, 08.11.2026)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.40306851010595396,
+  "FILTER_SIGMA_A_CT": 2.5466337402463926,
+  "FILTER_SIGMA_W_CT": 0.010443820094525779,
+  "IMM_P_STAY": 0.9745837733891589,
+  "DOPPLER_IN_IMM": false,
+  "DOPPLER_IN_NET": false,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": null
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [],
+ "corrector": "Transformer",
+ "hp": {
+  "hidden": 32,
+  "layers": 3,
+  "dropout": 0.12958350559263473
+ },
+ "response_ms": {
+  "imm_ms": 0.21283785617320192,
+  "net_cpu_ms": 0.2240499889012426,
+  "net_gpu_ms": 0.5005499988328665,
+  "total_cpu_ms": 0.43688784507444456,
+  "total_gpu_ms": 0.7133878550060685
+ },
+ "run": "merged_x1",
+ "role": "compare",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   62.403351541522866,
+   89.71764405408787,
+   128.37639561677688,
+   172.3698919347811,
+   217.27987574595025
+  ],
+  "r_multi": null
+ }
+}

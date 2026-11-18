@@ -1,0 +1,90 @@
+{
+ "case": "nodop",
+ "method": "stage6/ADE",
+ "label": "ADE",
+ "title": "Итоговая модель: IMM+LSTM, потери ADE вместо MSE",
+ "note": "итоговая модель случая (этап 7)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.40306851010595396,
+  "FILTER_SIGMA_A_CT": 2.5466337402463926,
+  "FILTER_SIGMA_W_CT": 0.010443820094525779,
+  "IMM_P_STAY": 0.9745837733891589,
+  "DOPPLER_IN_IMM": false,
+  "DOPPLER_IN_NET": false,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": null
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [
+  "ade"
+ ],
+ "corrector": "LSTM",
+ "hp": {
+  "hidden": 128,
+  "layers": 2,
+  "dropout": 0.19002112695312703
+ },
+ "response_ms": {
+  "imm_ms": 0.2086454545295566,
+  "net_cpu_ms": 0.23900001542642713,
+  "net_gpu_ms": 0.2424500125925988,
+  "total_cpu_ms": 0.44764546995598375,
+  "total_gpu_ms": 0.4510954671221554
+ },
+ "run": "merged_x1",
+ "role": "final",
+ "multi": {
+  "seed": 42,
+  "file": "multi_42.pt",
+  "method": "stage6/гипотезы",
+  "override": {
+   "FILTER_SIGMA_A_CV": 0.40306851010595396,
+   "FILTER_SIGMA_A_CT": 2.5466337402463926,
+   "FILTER_SIGMA_W_CT": 0.010443820094525779,
+   "IMM_P_STAY": 0.9745837733891589,
+   "DOPPLER_IN_IMM": false,
+   "DOPPLER_IN_NET": false,
+   "DOPPLER_TRUTH": "positions",
+   "FILTER_SIGMA_VR": null
+  }
+ },
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   62.13413711144123,
+   92.34295398525039,
+   131.62371858692111,
+   176.81878715993844,
+   223.39969523944868
+  ],
+  "r_multi": [
+   49.770073241652184,
+   65.77058011145309,
+   86.40486223654202,
+   109.31724875865197,
+   132.4180070570425
+  ]
+ }
+}

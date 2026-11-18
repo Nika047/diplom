@@ -1,0 +1,107 @@
+{
+  "format": "radar_app/scenario",
+  "version": 1,
+  "scenarios": [
+    {
+      "name": "Итоговая модель без доплера и IMM",
+      "note": "Итоговая модель текста - IMM+LSTM на MSE (compare/IMM_LSTM, seed 42) против подобранного IMM случая. Полёт test merged_x1: 3 маневра, соотношение итоговой и IMM близко к среднему по test.",
+      "flight": { "source": "log", "file": "GoDiscover-2025-12-18-150020.csv", "piece": 0 },
+      "models": ["merged_x1/nodop/compare/IMM_LSTM:hyb", "merged_x1/nodop:imm"],
+      "mode": { "type": "full" },
+      "radar": { "pd": 1.0 },
+      "view": { "basemap": "osm", "horizons_s": [2, 10], "layers": ["plots", "truth", "phases", "gate"], "focus": true }
+    },
+    {
+      "name": "Итоговая модель с доплером по телеметрии и IMM",
+      "note": "Итоговая модель текста - IMM+Transformer на MSE (compare/IMM_Transformer, seed 42) против подобранного IMM случая.",
+      "flight": { "source": "log", "file": "GoDiscover-2025-12-18-150020.csv", "piece": 0 },
+      "models": ["merged_x1/dop_tele/compare/IMM_Transformer:hyb", "merged_x1/dop_tele:imm"],
+      "mode": { "type": "full" },
+      "radar": { "pd": 1.0 },
+      "view": { "basemap": "osm", "horizons_s": [2, 10], "layers": ["plots", "truth", "phases", "gate"], "focus": true }
+    },
+    {
+      "name": "Цена потерь ADE: итоговая модель на MSE и та же сеть на ADE",
+      "note": "Без доплера: IMM+LSTM на MSE (итоговая, compare/IMM_LSTM, seed 42) и IMM+LSTM на ADE (пакет случая nodop). Смотреть вход в маневр и строб на 10 с: у ADE вход хуже, строб шире. Полёт test merged_x1: 256 с, 7 маневров.",
+      "flight": { "source": "log", "file": "Z84-2025-05-02-200404.csv", "piece": 0 },
+      "models": ["merged_x1/nodop/compare/IMM_LSTM:hyb", "merged_x1/nodop:hyb", "merged_x1/nodop:imm"],
+      "mode": { "type": "full" },
+      "radar": { "pd": 1.0 },
+      "view": { "basemap": "osm", "horizons_s": [10], "layers": ["plots", "truth", "phases", "gate"], "focus": true }
+    },
+    {
+      "name": "Архитектуры корректора без доплера",
+      "note": "Корректоры этапа 2 на MSE, seed 42: LSTM (итоговая), GRU, Transformer, Mamba; рядом IMM.",
+      "flight": { "source": "log", "file": "GoDiscover-2025-12-18-150020.csv", "piece": 0 },
+      "models": [
+        "merged_x1/nodop/compare/IMM_LSTM:hyb",
+        "merged_x1/nodop/compare/IMM_GRU:hyb",
+        "merged_x1/nodop/compare/IMM_Transformer:hyb",
+        "merged_x1/nodop/compare/IMM_Mamba:hyb",
+        "merged_x1/nodop:imm"
+      ],
+      "mode": { "type": "full" },
+      "radar": { "pd": 1.0 },
+      "view": { "basemap": "osm", "horizons_s": [10], "layers": ["plots", "truth", "phases"], "focus": true }
+    },
+    {
+      "name": "Выходной слой под ADE рядом с исходными корректорами, без доплера",
+      "note": "compare/<имя>_ADE - те же сети этапа 2, веса выходного слоя пересчитаны под ADE без обучения сети (diplom_backup/weight_surgery).",
+      "flight": { "source": "log", "file": "GoDiscover-2025-12-18-150020.csv", "piece": 0 },
+      "models": [
+        "merged_x1/nodop/compare/IMM_LSTM:hyb",
+        "merged_x1/nodop/compare/IMM_LSTM_ADE:hyb",
+        "merged_x1/nodop/compare/IMM_GRU:hyb",
+        "merged_x1/nodop/compare/IMM_GRU_ADE:hyb",
+        "merged_x1/nodop/compare/IMM_Transformer:hyb",
+        "merged_x1/nodop/compare/IMM_Transformer_ADE:hyb",
+        "merged_x1/nodop/compare/IMM_Mamba:hyb",
+        "merged_x1/nodop/compare/IMM_Mamba_ADE:hyb"
+      ],
+      "mode": { "type": "full" },
+      "radar": { "pd": 1.0 },
+      "view": { "basemap": "osm", "horizons_s": [10], "layers": ["plots", "truth", "phases"], "focus": true }
+    },
+    {
+      "name": "Среднее трёх seed и каждый seed, доплер по телеметрии",
+      "note": "kind ens - среднее поправок трёх seed итоговой модели (IMM+Transformer на MSE, compare); рядом гибриды с seed 42, 43, 44.",
+      "flight": { "source": "log", "file": "GoDiscover-2025-12-18-150020.csv", "piece": 0 },
+      "models": [
+        "merged_x1/dop_tele/compare/IMM_Transformer:ens",
+        { "bundle": "merged_x1/dop_tele/compare/IMM_Transformer", "kind": "hyb", "members": [42] },
+        { "bundle": "merged_x1/dop_tele/compare/IMM_Transformer", "kind": "hyb", "members": [43] },
+        { "bundle": "merged_x1/dop_tele/compare/IMM_Transformer", "kind": "hyb", "members": [44] }
+      ],
+      "mode": { "type": "full" },
+      "radar": { "pd": 1.0 },
+      "view": { "basemap": "osm", "horizons_s": [10], "layers": ["plots", "truth", "phases"], "focus": true }
+    },
+    {
+      "name": "Сгенерированная траектория test",
+      "note": "synth_mixed_0020 из test merged_x1 (сценарий mixed, 254 с, 4 маневра). У траектории нет широты и долготы - только плоскость.",
+      "flight": { "source": "track", "run": "merged_x1", "id": "synth_mixed_0020" },
+      "models": ["merged_x1/nodop/compare/IMM_LSTM:hyb", "merged_x1/nodop:imm"],
+      "mode": { "type": "full" },
+      "radar": { "pd": 1.0 },
+      "view": { "basemap": "plane", "horizons_s": [2, 10], "layers": ["plots", "truth", "phases", "gate"] }
+    },
+    {
+      "name": "Пропуски отметок: Pd 0,7",
+      "note": "Тот же полёт, что у «Итоговая модель без доплера и IMM», вероятность обнаружения 0,7.",
+      "flight": { "source": "log", "file": "GoDiscover-2025-12-18-150020.csv", "piece": 0 },
+      "models": ["merged_x1/nodop/compare/IMM_LSTM:hyb", "merged_x1/nodop:imm"],
+      "mode": { "type": "full" },
+      "radar": { "pd": 0.7 },
+      "view": { "basemap": "osm", "horizons_s": [2, 10], "layers": ["plots", "truth", "phases", "gate"], "focus": true }
+    },
+    {
+      "name": "Реальное время x10, доплер по телеметрии",
+      "note": "Те же модели и полёт, что у «Итоговая модель с доплером по телеметрии и IMM» (режим full); панель задержек.",
+      "flight": { "source": "log", "file": "GoDiscover-2025-12-18-150020.csv", "piece": 0 },
+      "models": ["merged_x1/dop_tele/compare/IMM_Transformer:hyb", "merged_x1/dop_tele:imm"],
+      "mode": { "type": "realtime", "speed": 10, "start_scan": 0, "autoplay": true },
+      "radar": { "pd": 1.0 },
+      "view": { "basemap": "osm", "horizons_s": [2, 10], "layers": ["plots", "truth", "phases", "gate"] }
+    }
+  ]
+}

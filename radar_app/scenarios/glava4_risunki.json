@@ -1,0 +1,15 @@
+{
+  "format": "radar_app/scenario",
+  "version": 1,
+  "scenarios": [
+    {
+      "name": "Рис. 23: три варианта прогноза и строб из трёх кругов",
+      "note": "Глава 4.9.4 ссылается на рисунок 23: варианты «прямо», «влево», «вправо» итоговой модели без радиальной скорости (IMM+LSTM на MSE, compare/IMM_LSTM, seed 42) и круги строба на 10 с. Рисунки 25-28 - файлы папки «текст диплома/сценарии».",
+      "flight": { "source": "log", "file": "GoDiscover-2025-12-18-150020.csv", "piece": 0 },
+      "models": [{ "bundle": "merged_x1/nodop/compare/IMM_LSTM", "kind": "hyb", "members": [42] }],
+      "mode": { "type": "full" },
+      "radar": { "pd": 1.0 },
+      "view": { "basemap": "osm", "horizons_s": [10], "layers": ["plots", "truth", "phases", "variants", "gate"], "focus": true }
+    }
+  ]
+}

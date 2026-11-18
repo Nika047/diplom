@@ -1,0 +1,110 @@
+{
+ "IMM+GRU": {
+  "best": {
+   "window": 20,
+   "net_input": true,
+   "hidden": 64,
+   "layers": 3,
+   "dropout": 0.24223204654921876,
+   "batch": 1024,
+   "lr": 0.0005070565734572889,
+   "weight_decay": 0.0008228984573308163
+  },
+  "fast": {
+   "window": 20,
+   "net_input": true,
+   "hidden": 64,
+   "layers": 2,
+   "dropout": 0.24223204654921876,
+   "batch": 1024,
+   "lr": 0.0005846187064070543,
+   "weight_decay": 3.3350264835699586e-06
+  },
+  "ade_val": 35.03779220581055,
+  "ms_best": 0.15439995331689715,
+  "ade_val_fast": 35.41672897338867,
+  "ms_fast": 0.12365001020953059,
+  "ade_val_default": 35.38730239868164,
+  "trials": 30
+ },
+ "IMM+Transformer": {
+  "best": {
+   "window": 20,
+   "net_input": true,
+   "hidden": 64,
+   "layers": 3,
+   "dropout": 0.22823551458506922,
+   "batch": 512,
+   "lr": 0.0005070565734572889,
+   "weight_decay": 1.9170041589170666e-05
+  },
+  "fast": {
+   "window": 20,
+   "net_input": true,
+   "hidden": 64,
+   "layers": 2,
+   "dropout": 0.012232542466429174,
+   "batch": 1024,
+   "lr": 0.0005846187064070543,
+   "weight_decay": 2.720724805948669e-06
+  },
+  "ade_val": 34.65864181518555,
+  "ms_best": 0.5296000745147467,
+  "ade_val_fast": 35.23644256591797,
+  "ms_fast": 0.3745500580407679,
+  "ade_val_default": 34.848411560058594,
+  "trials": 30
+ },
+ "GRU (без IMM)": {
+  "best": {
+   "window": 20,
+   "hidden": 128,
+   "layers": 3,
+   "dropout": 0.010316556334565519,
+   "batch": 256,
+   "lr": 0.000614939415628505,
+   "weight_decay": 3.632486956676606e-05
+  },
+  "fast": {
+   "window": 20,
+   "hidden": 64,
+   "layers": 2,
+   "dropout": 0.1,
+   "batch": 512,
+   "lr": 0.001,
+   "weight_decay": 0.0001
+  },
+  "ade_val": 34.596336364746094,
+  "ms_best": 0.20944996504113078,
+  "ade_val_fast": 35.40355682373047,
+  "ms_fast": 0.12440001592040062,
+  "ade_val_default": 35.40355682373047,
+  "trials": 30
+ },
+ "Transformer (без IMM)": {
+  "best": {
+   "window": 20,
+   "hidden": 128,
+   "layers": 3,
+   "dropout": 0.04227726749242879,
+   "batch": 512,
+   "lr": 0.001770469439407015,
+   "weight_decay": 1.2327891605450794e-05
+  },
+  "fast": {
+   "window": 20,
+   "hidden": 128,
+   "layers": 2,
+   "dropout": 0.035878273781490506,
+   "batch": 512,
+   "lr": 0.001775685400639093,
+   "weight_decay": 3.0296104428212496e-05
+  },
+  "ade_val": 34.703163146972656,
+  "ms_best": 0.534249993506819,
+  "ade_val_fast": 35.212921142578125,
+  "ms_fast": 0.3728500450961292,
+  "ade_val_default": 35.751495361328125,
+  "trials": 30
+ }
+}

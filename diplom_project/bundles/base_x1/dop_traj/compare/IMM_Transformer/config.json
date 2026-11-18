@@ -1,0 +1,67 @@
+{
+ "case": "dop_traj",
+ "method": "stage2/IMM+Transformer",
+ "label": "IMM+Transformer",
+ "title": "IMM+Transformer",
+ "note": "корректор этапа 2 для сравнения (лучший по ADE val)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.3299405583450013,
+  "FILTER_SIGMA_A_CT": 2.346787531982524,
+  "FILTER_SIGMA_W_CT": 0.005614633922822615,
+  "IMM_P_STAY": 0.969109809481554,
+  "DOPPLER_IN_IMM": true,
+  "DOPPLER_IN_NET": true,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": 0.5
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [],
+ "corrector": "Transformer",
+ "hp": {
+  "hidden": 32,
+  "layers": 2,
+  "dropout": 0.0913841307520112
+ },
+ "response_ms": {
+  "imm_ms": 0.2577484396505555,
+  "net_cpu_ms": 0.15634999726898968,
+  "net_gpu_ms": 0.3552000125637278,
+  "total_cpu_ms": 0.4140984369195452,
+  "total_gpu_ms": 0.6129484522142833
+ },
+ "run": "base_x1",
+ "role": "compare",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   60.44195557937109,
+   80.48635176945515,
+   108.86878368193678,
+   144.23192059930187,
+   188.26617854852938
+  ],
+  "r_multi": null
+ }
+}

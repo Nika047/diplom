@@ -1,0 +1,50 @@
+{
+ "case": "nodop",
+ "method": "stage1/CV",
+ "label": "Линейная экстраполяция",
+ "title": "Линейная экстраполяция",
+ "note": "CV этапа 1, подобранное число отметок",
+ "model": "classic",
+ "classic": {
+  "method": "cv",
+  "n_points": 16
+ },
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.40306851010595396,
+  "FILTER_SIGMA_A_CT": 2.5466337402463926,
+  "FILTER_SIGMA_W_CT": 0.010443820094525779,
+  "IMM_P_STAY": 0.9745837733891589,
+  "DOPPLER_IN_IMM": false,
+  "DOPPLER_IN_NET": false,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": null
+ },
+ "members": [],
+ "spec": [],
+ "response_ms": {
+  "imm_ms": 0.20477679789349376,
+  "total_cpu_ms": 0.20477679789349376
+ },
+ "run": "merged_x1",
+ "role": "extra",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   176.13859560419948,
+   223.5318374462051,
+   274.8535476319303,
+   327.6708702877853,
+   378.6044509753793
+  ],
+  "r_multi": null
+ }
+}

@@ -1,0 +1,88 @@
+{
+ "case": "dop_tele",
+ "method": "stage2/IMM+Transformer (быстрая)",
+ "label": "IMM+Transformer (быстрая)",
+ "title": "Итоговая модель: IMM+Transformer (быстрая)",
+ "note": "итоговая модель случая (этап 7)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.3299405583450013,
+  "FILTER_SIGMA_A_CT": 2.346787531982524,
+  "FILTER_SIGMA_W_CT": 0.012988262560967663,
+  "IMM_P_STAY": 0.969109809481554,
+  "DOPPLER_IN_IMM": true,
+  "DOPPLER_IN_NET": true,
+  "DOPPLER_TRUTH": "telemetry",
+  "FILTER_SIGMA_VR": 5.0
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [],
+ "corrector": "Transformer",
+ "hp": {
+  "hidden": 64,
+  "layers": 2,
+  "dropout": 0.24223204654921876
+ },
+ "response_ms": {
+  "imm_ms": 0.2586180461113173,
+  "net_cpu_ms": 0.17940001271199435,
+  "net_gpu_ms": 0.35339999885763973,
+  "total_cpu_ms": 0.43801805882331163,
+  "total_gpu_ms": 0.612018044968957
+ },
+ "run": "base_x1",
+ "role": "final",
+ "multi": {
+  "seed": 42,
+  "file": "multi_42.pt",
+  "method": "stage6/гипотезы",
+  "override": {
+   "FILTER_SIGMA_A_CV": 0.3299405583450013,
+   "FILTER_SIGMA_A_CT": 2.346787531982524,
+   "FILTER_SIGMA_W_CT": 0.012988262560967663,
+   "IMM_P_STAY": 0.969109809481554,
+   "DOPPLER_IN_IMM": true,
+   "DOPPLER_IN_NET": true,
+   "DOPPLER_TRUTH": "telemetry",
+   "FILTER_SIGMA_VR": 5.0
+  }
+ },
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   59.6522320829996,
+   80.75661979054001,
+   106.66204277428818,
+   139.79950529347965,
+   179.52569134107708
+  ],
+  "r_multi": [
+   52.166570974910044,
+   62.91990061465526,
+   80.05057155002127,
+   98.14053378894941,
+   118.89452194931218
+  ]
+ }
+}

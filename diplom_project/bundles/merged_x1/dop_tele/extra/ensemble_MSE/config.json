@@ -1,0 +1,71 @@
+{
+ "case": "dop_tele",
+ "method": "stage8/ансамбль жадный из 4",
+ "label": "ансамбль жадный из 4",
+ "title": "Жадный ансамбль (до потерь ADE)",
+ "note": "этап 8, пересчёт 06-07.11.2026: IMM+Mamba, три варианта, два seed LSTM без IMM",
+ "model": "ensemble",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.21951997004258864,
+  "FILTER_SIGMA_A_CT": 2.346787531982524,
+  "FILTER_SIGMA_W_CT": 0.012988262560967663,
+  "IMM_P_STAY": 0.9192540111837167,
+  "DOPPLER_IN_IMM": true,
+  "DOPPLER_IN_NET": true,
+  "DOPPLER_TRUTH": "telemetry",
+  "FILTER_SIGMA_VR": 5.0
+ },
+ "members": [],
+ "parts": [
+  {
+   "seed": 43,
+   "file": "part0_43.pt",
+   "method": "stage2/LSTM (без IMM)"
+  },
+  {
+   "seed": 44,
+   "file": "part1_44.pt",
+   "method": "stage6/гипотезы"
+  },
+  {
+   "seed": 42,
+   "file": "part2_42.pt",
+   "method": "stage2/LSTM (без IMM)"
+  },
+  {
+   "seed": 42,
+   "file": "part3_42.pt",
+   "method": "stage2/IMM+Mamba"
+  }
+ ],
+ "spec": [],
+ "response_ms": {
+  "imm_ms": 0.2695208955132826,
+  "net_cpu_ms": 2.5164500111714005,
+  "net_gpu_ms": null,
+  "total_cpu_ms": 2.785970906684683,
+  "total_gpu_ms": 8.621520914444277
+ },
+ "run": "merged_x1",
+ "role": "extra",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   54.52559061761095,
+   74.8026153148171,
+   103.25578514035094,
+   139.4252737044785,
+   181.3209503673193
+  ],
+  "r_multi": null
+ }
+}

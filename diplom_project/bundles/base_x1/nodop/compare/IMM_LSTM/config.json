@@ -1,0 +1,67 @@
+{
+ "case": "nodop",
+ "method": "stage2/IMM+LSTM",
+ "label": "IMM+LSTM",
+ "title": "IMM+LSTM",
+ "note": "корректор этапа 2 для сравнения (лучший по ADE val)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.40306851010595396,
+  "FILTER_SIGMA_A_CT": 2.5466337402463926,
+  "FILTER_SIGMA_W_CT": 0.010443820094525779,
+  "IMM_P_STAY": 0.9745837733891589,
+  "DOPPLER_IN_IMM": false,
+  "DOPPLER_IN_NET": false,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": null
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [],
+ "corrector": "LSTM",
+ "hp": {
+  "hidden": 64,
+  "layers": 2,
+  "dropout": 0.1822634555704315
+ },
+ "response_ms": {
+  "imm_ms": 0.2126934871158412,
+  "net_cpu_ms": 0.13050000416114926,
+  "net_gpu_ms": 0.13770000077784061,
+  "total_cpu_ms": 0.3431934912769905,
+  "total_gpu_ms": 0.35039348789368185
+ },
+ "run": "base_x1",
+ "role": "compare",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   63.78435583632928,
+   88.15985461825751,
+   121.05584978794877,
+   159.52337410442516,
+   204.46531252227376
+  ],
+  "r_multi": null
+ }
+}

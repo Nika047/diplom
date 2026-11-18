@@ -1,0 +1,67 @@
+{
+ "case": "nodop",
+ "method": "stage2/IMM+GRU",
+ "label": "IMM+GRU (выход под ADE)",
+ "title": "IMM+GRU, выход под ADE",
+ "note": "корректор этапа 2; веса выходного слоя пересчитаны под ADE на train без обучения сети (diplom_backup/weight_surgery, шаг 7, 08.11.2026)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.40306851010595396,
+  "FILTER_SIGMA_A_CT": 2.5466337402463926,
+  "FILTER_SIGMA_W_CT": 0.010443820094525779,
+  "IMM_P_STAY": 0.9745837733891589,
+  "DOPPLER_IN_IMM": false,
+  "DOPPLER_IN_NET": false,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": null
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [],
+ "corrector": "GRU",
+ "hp": {
+  "hidden": 128,
+  "layers": 2,
+  "dropout": 0.17936999364332554
+ },
+ "response_ms": {
+  "imm_ms": 0.21342862957552722,
+  "net_cpu_ms": 0.5913499917369336,
+  "net_gpu_ms": 0.19434999558143318,
+  "total_cpu_ms": 0.8047786213124608,
+  "total_gpu_ms": 0.4077786251569604
+ },
+ "run": "merged_x1",
+ "role": "compare",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   61.899153464185694,
+   90.00975405270272,
+   128.52710834898656,
+   172.4418835942681,
+   217.37241329310444
+  ],
+  "r_multi": null
+ }
+}

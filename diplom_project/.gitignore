@@ -1,0 +1,24 @@
+# Генерируется запуском этапов
+.venv/
+log/
+results/
+cache/
+artifacts/
+model_store/
+# Копии с домашнего ПК и отложенные папки рабочего ПК (07.11.2026)
+log_home/
+cache_workpc_old/
+model_store_workpc_old/
+log_merged/
+results_merged/
+cache_merged/
+artifacts_merged/
+__pycache__/
+*.pyc
+
+# Вывод консоли фоновых запусков на домашнем ПК и собранные из него сводки
+*.out
+summaries_merged.txt
+
+# Исполняемые файлы из папки логов не хранить
+*.exe

@@ -1,0 +1,59 @@
+{
+ "case": "nodop",
+ "method": "stage1/KF",
+ "label": "Фильтр Калмана",
+ "title": "Фильтр Калмана",
+ "note": "KF этапа 1, подобранные параметры",
+ "model": "classic",
+ "classic": {
+  "method": "kf",
+  "override": {
+   "FILTER_SIGMA_A_CV": 1.0836564639066482,
+   "FILTER_SIGMA_A_CT": 2.5466337402463926,
+   "FILTER_SIGMA_W_CT": 0.010443820094525779,
+   "IMM_P_STAY": 0.9745837733891589,
+   "DOPPLER_IN_IMM": false,
+   "DOPPLER_IN_NET": false,
+   "DOPPLER_TRUTH": "positions",
+   "FILTER_SIGMA_VR": null
+  }
+ },
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.40306851010595396,
+  "FILTER_SIGMA_A_CT": 2.5466337402463926,
+  "FILTER_SIGMA_W_CT": 0.010443820094525779,
+  "IMM_P_STAY": 0.9745837733891589,
+  "DOPPLER_IN_IMM": false,
+  "DOPPLER_IN_NET": false,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": null
+ },
+ "members": [],
+ "spec": [],
+ "response_ms": {
+  "imm_ms": 0.20477679789349376,
+  "total_cpu_ms": 0.20477679789349376
+ },
+ "run": "merged_x1",
+ "role": "extra",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   112.88602733991091,
+   173.33801627199094,
+   244.3198631742217,
+   317.80679079102055,
+   387.5089384178491
+  ],
+  "r_multi": null
+ }
+}

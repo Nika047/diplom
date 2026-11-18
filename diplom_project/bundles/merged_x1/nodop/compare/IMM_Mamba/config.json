@@ -1,0 +1,67 @@
+{
+ "case": "nodop",
+ "method": "stage2/IMM+Mamba",
+ "label": "IMM+Mamba",
+ "title": "IMM+Mamba",
+ "note": "корректор этапа 2 для сравнения (лучший по ADE val)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.40306851010595396,
+  "FILTER_SIGMA_A_CT": 2.5466337402463926,
+  "FILTER_SIGMA_W_CT": 0.010443820094525779,
+  "IMM_P_STAY": 0.9745837733891589,
+  "DOPPLER_IN_IMM": false,
+  "DOPPLER_IN_NET": false,
+  "DOPPLER_TRUTH": "positions",
+  "FILTER_SIGMA_VR": null
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [],
+ "corrector": "Mamba",
+ "hp": {
+  "hidden": 64,
+  "layers": 3,
+  "dropout": 0.07186856720009173
+ },
+ "response_ms": {
+  "imm_ms": 0.21229443691444697,
+  "net_cpu_ms": 2.348649999476038,
+  "net_gpu_ms": 6.2550000147894025,
+  "total_cpu_ms": 2.5609444363904847,
+  "total_gpu_ms": 6.467294451703849
+ },
+ "run": "merged_x1",
+ "role": "compare",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   63.36488535897045,
+   90.61908034414253,
+   127.08123878549205,
+   169.75913943276325,
+   213.5492269782648
+  ],
+  "r_multi": null
+ }
+}

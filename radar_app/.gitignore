@@ -1,0 +1,17 @@
+# Движок
+engine/.venv/
+engine/log/
+__pycache__/
+*.pyc
+
+# Сервер
+server/**/bin/
+server/**/obj/
+server/**/logs/
+server/**/App_Data/
+.vs/
+
+# Клиент
+client/node_modules/
+client/dist/
+client/*.tsbuildinfo

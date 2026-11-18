@@ -1,0 +1,67 @@
+{
+ "case": "dop_tele",
+ "method": "stage2/IMM+GRU",
+ "label": "IMM+GRU",
+ "title": "IMM+GRU",
+ "note": "корректор этапа 2 для сравнения (лучший по ADE val)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.3299405583450013,
+  "FILTER_SIGMA_A_CT": 2.346787531982524,
+  "FILTER_SIGMA_W_CT": 0.012988262560967663,
+  "IMM_P_STAY": 0.969109809481554,
+  "DOPPLER_IN_IMM": true,
+  "DOPPLER_IN_NET": true,
+  "DOPPLER_TRUTH": "telemetry",
+  "FILTER_SIGMA_VR": 5.0
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [],
+ "corrector": "GRU",
+ "hp": {
+  "hidden": 64,
+  "layers": 2,
+  "dropout": 0.21846490458355786
+ },
+ "response_ms": {
+  "imm_ms": 0.2578949796483224,
+  "net_cpu_ms": 0.5088500038255006,
+  "net_gpu_ms": 0.14629999350290745,
+  "total_cpu_ms": 0.766744983473823,
+  "total_gpu_ms": 0.4041949731512299
+ },
+ "run": "base_x1",
+ "role": "compare",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   63.22402325863179,
+   82.42704786110386,
+   108.35856464316451,
+   141.89401498656588,
+   181.6455845061201
+  ],
+  "r_multi": null
+ }
+}

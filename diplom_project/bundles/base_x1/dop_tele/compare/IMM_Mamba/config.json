@@ -1,0 +1,67 @@
+{
+ "case": "dop_tele",
+ "method": "stage2/IMM+Mamba",
+ "label": "IMM+Mamba",
+ "title": "IMM+Mamba",
+ "note": "корректор этапа 2 для сравнения (лучший по ADE val)",
+ "window": 20,
+ "override": {
+  "FILTER_SIGMA_A_CV": 0.3299405583450013,
+  "FILTER_SIGMA_A_CT": 2.346787531982524,
+  "FILTER_SIGMA_W_CT": 0.012988262560967663,
+  "IMM_P_STAY": 0.969109809481554,
+  "DOPPLER_IN_IMM": true,
+  "DOPPLER_IN_NET": true,
+  "DOPPLER_TRUTH": "telemetry",
+  "FILTER_SIGMA_VR": 5.0
+ },
+ "members": [
+  {
+   "seed": 42,
+   "file": "member_42.pt"
+  },
+  {
+   "seed": 43,
+   "file": "member_43.pt"
+  },
+  {
+   "seed": 44,
+   "file": "member_44.pt"
+  }
+ ],
+ "spec": [],
+ "corrector": "Mamba",
+ "hp": {
+  "hidden": 32,
+  "layers": 2,
+  "dropout": 0.0913841307520112
+ },
+ "response_ms": {
+  "imm_ms": 0.25611424693373996,
+  "net_cpu_ms": 1.4233999972930178,
+  "net_gpu_ms": 4.146150007727556,
+  "total_cpu_ms": 1.6795142442267577,
+  "total_gpu_ms": 4.402264254661296
+ },
+ "run": "base_x1",
+ "role": "compare",
+ "gate": {
+  "coverage": 0.95,
+  "calibrated_on": "val",
+  "horizon_s": [
+   2.0,
+   4.0,
+   6.0,
+   8.0,
+   10.0
+  ],
+  "r_one": [
+   60.20974292779484,
+   79.11486826420438,
+   104.44892180387014,
+   139.18951574623827,
+   175.8048981224529
+  ],
+  "r_multi": null
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "method": "stage6/ADE+MSE",
+ "base_method": "stage2/IMM+Transformer",
+ "spec": [
+  "mix"
+ ],
+ "rows": [
+  {
+   "method": "stage6/ADE+MSE",
+   "ade": 39.76059989707332,
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0,
+   "ms": 0.4131865023927235,
+   "equal": true
+  },
+  {
+   "method": "stage2/IMM+Transformer",
+   "ade": 41.04259588989461,
+   "diff": 1.2819959928212938,
+   "lo": 0.2098822806323113,
+   "hi": 2.4000244655254486,
+   "ms": 0.38993778382491173,
+   "equal": false
+  }
+ ],
+ "survivors": [
+  "mix"
+ ],
+ "tuned": {}
+}
